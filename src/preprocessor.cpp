@@ -45,10 +45,10 @@ vector<Token> preprocess_equs_ifs(const vector<Token>& tokens) {
     return processed_tokens;
 }
 
-void macro_call(size_t &i, const vector<Token> &tokens,
+void macro_call(size_t &i, const vector<Token> &tokens,   
                 vector<Token> &processed_tokens,
                 MacroNameTable &mnt, MacroDefinitionTable &mdt) {
-
+                                                                               
     Token macro = tokens[i];
     auto [number_arguments, definition_address] = mnt[macro];
     std::unordered_map<string, Token> arguments;
