@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.10)
-project(MONTADOR)
+project(TRADUTOR)
 
 # Set C++17 standard
 set(CMAKE_CXX_STANDARD 17)
@@ -12,7 +12,7 @@ file(GLOB SOURCES "src/*.cpp")
 
 # Add main executable
 add_compile_options(-Wall -Wextra -Werror=init-self)
-add_executable(MONTADOR ${SOURCES})
+add_executable(TRADUTOR ${SOURCES})
 
 # We're using Catch2 as a testing library
 # https://github.com/catchorg/Catch2

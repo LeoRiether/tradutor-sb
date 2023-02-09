@@ -42,7 +42,7 @@ DEP_FILES = $(addprefix $(DEP_PATH)/,$(addsuffix .d,$(FILE_NAMES)))
 OBJ_FILES = $(addprefix $(BIN_PATH)/,$(notdir $(CPP_FILES:.cpp=.o)))
 
 ##### Executable name
-EXEC = MONTADOR
+EXEC = TRADUTOR
 
 ###################################
 ##### Windows Makefile
