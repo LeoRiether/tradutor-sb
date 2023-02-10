@@ -1,3 +1,20 @@
+section .bss
+    int.buffer resb 12 ; buffer for OUTPUT.int
+
+    %assign FIBS_N 50
+    fibs resd FIBS_N
+
+section .data
+
+    str1 db "Hello World!", 10 
+    str1_len equ $-str1
+
+    str2 db "Hello Assembly!", 10
+    str2_len equ $-str2
+
+    str3 db "Hello there!", 10
+    str3_len equ $-str3
+
 section .text
 global _start
 
@@ -9,7 +26,7 @@ _start:
 
     mov ecx, 0 ; i
 print_fibs.loop:
-    cmp ecx, 16
+    cmp ecx, FIBS_N
     jge print_fibs.out
 
     ; Print the i-th fibonacci number
@@ -35,11 +52,11 @@ exit:
 ;        Calc fibs        ;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;
 calc_fibs:
-    mov DWORD [fibs], 1
+    mov DWORD [fibs], 0
     mov DWORD [fibs+4], 1
     mov ecx, 2
 calc_fibs.loop:
-    cmp ecx, 16
+    cmp ecx, FIBS_N
     jge calc_fibs.exit
     
     mov eax, [fibs+ecx*4-4]
@@ -148,19 +165,4 @@ OUTPUT.ztstr.loop:
     jmp OUTPUT.ztstr.loop
 OUTPUT.ztstr.exit:
     ret
-
-section .bss
-    int.buffer resb 12 ; buffer for OUTPUT.int
-    fibs resd 16
-
-section .data
-
-    str1 db "Hello World!", 10 
-    str1_len equ $-str1
-
-    str2 db "Hello Assembly!", 10
-    str2_len equ $-str2
-
-    str3 db "Hello there!", 10
-    str3_len equ $-str3
 
