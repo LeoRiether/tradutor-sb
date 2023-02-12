@@ -1,0 +1,45 @@
+SECTION TEXT
+    INPUT X
+    LOAD X
+
+LOOP:
+    ; REM BASE
+    DIV BASE
+    MUL BASE
+    STORE AUX
+    LOAD X
+    SUB AUX
+
+    SUB NINE ; rem > 9
+    JMPP AF
+    ; [0..9]
+    ADD NINE
+    ADD ZEROASCII
+    STORE CHR
+    OUTPUT_C CHR
+    JMP LOOPCONTINUE
+
+AF:
+    ; [A..F]
+    ADD NINE
+    ADD AASCII
+    STORE CHR
+    OUTPUT_C CHR
+
+LOOPCONTINUE:
+    LOAD X
+    DIV BASE
+    STORE X
+    JMPP LOOP
+
+OUT:
+    STOP
+
+SECTION DATA
+    BASE: CONST 16
+    NINE: CONST 10
+    AASCII: CONST 65
+    ZEROASCII: CONST 48
+    X: SPACE
+    CHR: SPACE
+    AUX: SPACE
