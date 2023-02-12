@@ -1,11 +1,29 @@
 #include <codegen.hpp>
 
+const char* indent = "    ";
+
 std::ostream& operator<<(std::ostream& os, const GeneratorState& gs) {
+    os << "section .text\n";
+    os << gs.text.rdbuf() << '\n';
+
+    os << "section .bss\n";
+    os << gs.bss.rdbuf() << '\n';
+
+    os << "section .data\n";
+    os << gs.data.rdbuf() << '\n';
 
     return os;
 }
 
-void gen_instruction(GeneratorState& state, const Line& instruction_line) {
+void gen_label(GeneratorState& state, const Line& line) {
+    if (state.current_section == GeneratorState::Section::Text)
+        state.text << line.data[0] << ":\n";
+    else
+        // We don't know yet if we should put the label on .data or .bss 
+        state.pending_labels.emplace(line.data[0]);
+}
+
+void gen_instruction(GeneratorState& state, const Line& line) {
     // Token instruction = line.data[0];
     // machine_code.push_back(instr_data.opcode);
     // for (size_t i = 1; i < instr_data.size; i++) {
@@ -19,19 +37,32 @@ void gen_instruction(GeneratorState& state, const Line& instruction_line) {
     // }
 }
 
-void gen_directive(GeneratorState& state, const Line& directive_line) {
-    // Token directive = line.data[0];
-    // if (directive == "SPACE")
-    //     machine_code.resize(machine_code.size() + line.num, 0);
-    // else if (directive == "CONST")
-    //     machine_code.push_back(line.num);
+void gen_directive(GeneratorState& state, const Line& line) {
+    Token directive = line.data[0];
+    stringstream& section = directive == "SPACE" ? state.bss : state.data;
+
+    // Put the pending labels in the section they belong 
+    while (!state.pending_labels.empty()) {
+        const string label = state.pending_labels.front();
+        state.pending_labels.pop();
+        section << label << ":\n";
+    }
+  
+    if (directive == "SPACE")
+        section << indent << "resd " << line.num << '\n';
+    else if (directive == "CONST")
+        section << indent << "dd " << line.num << '\n';
 }
 
 GeneratorState generate_ia32(const vector<Line>& lines) {
     GeneratorState state;
     for (const auto& line : lines) {
+        // Label
+        if (line.which == Line::IsLabel) {
+            gen_label(state, line);
+        }
         // Instruction
-        if (line.which == Line::IsInstruction) {
+        else if (line.which == Line::IsInstruction) {
             gen_instruction(state, line);
         }
         // Directive

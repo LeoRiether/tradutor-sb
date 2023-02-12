@@ -1,16 +1,24 @@
 #pragma once
+#include <bitset>
+#include <iostream>
 #include <parser.hpp>
+#include <queue>
+#include <sstream>
 #include <string>
 #include <unordered_map>
 
 using std::string;
+using std::stringstream;
 
 struct GeneratorState {
-    // TODO: do we even need to know the current section?
     enum Section { Text, Data };
     Section current_section;
+    std::queue<string> pending_labels;
 
-    string data, bss, text;
+    enum Features { Output_I, Input_I, Output_S, Input_S, FeatureLen };
+    std::bitset<FeatureLen> used_feature;
+
+    stringstream data, bss, text;
 
     GeneratorState() : current_section(Text), data(""), bss(""), text("") {
     }
@@ -23,4 +31,7 @@ inline GeneratorState::Section section_from_string(const string& section) {
                              : GeneratorState::Section::Text;
 }
 
+void gen_label(GeneratorState& state, const Line& line);
+void gen_instruction(GeneratorState& state, const Line& line);
+void gen_directive(GeneratorState& state, const Line& line);
 GeneratorState generate_ia32(const vector<Line>& lines);

@@ -6,6 +6,7 @@
 #include <iostream>
 #include <lexer.hpp>
 #include <preprocessor.hpp>
+#include <sstream>
 
 using std::cerr;
 using std::endl;
@@ -24,7 +25,7 @@ Box token_box(const vector<Token>& tokens, const char* title = "Tokens") {
 
 int do_preprocessing(std::string file_base);
 int do_macros(std::string file_base);
-int do_object_code(std::string file_base);
+int do_translation(std::string file_base);
 
 int main(int argc, char* argv[]) {
     if (argc < 3 || argv[1][0] != '-') {
@@ -52,7 +53,7 @@ int main(int argc, char* argv[]) {
         int ret;
         if (*op == 'p') ret = do_preprocessing(argv[2]);
         else if (*op == 'm') ret = do_macros(argv[2]);
-        else if (*op == 'o') ret = do_object_code(argv[2]);
+        else if (*op == 'o') ret = do_translation(argv[2]);
         else {
             cerr << "A operação <" << argv[1] << "> não existe" << endl;
             return 1;
@@ -124,9 +125,9 @@ int do_macros(std::string file_base) {
 }
 
 // Lê um arquivo MCR e produz um OBJ
-int do_object_code(std::string file_base) {
+int do_translation(std::string file_base) {
     std::ifstream file(file_base + ".MCR");
-    std::ofstream output(file_base + ".OBJ");
+    std::ofstream output(file_base + ".S");
 
     if (!file.is_open()) {
         cerr << "Não foi possível abrir o arquivo <" << file_base << ".ASM"
@@ -147,36 +148,18 @@ int do_object_code(std::string file_base) {
             cerr << box << endl;
         }
 
-        auto symbols = build_symbol_table(lines);
-
-        // Print symbol table
-        {
-            Box box{"Symbol Table"};
-            for (const auto& [key, value] : symbols)
-                box << key << " -> " << std::to_string(value) << "\n";
-            cerr << box << endl;
-        }
-
-        // Assemble program...
-        auto code = generate_machine_code(lines, symbols);
+        // Translate program...
+        std::stringstream code;
+        code << generate_ia32(lines);
 
         // ...and write it to the output file
-        bool first = true;
-        for (auto x : code) {
-            if (!first)
-                output << ' ';
-            first = false;
-
-            output << x;
-        }
-        output << '\n';
+        output << code.str();
         output.close();
 
-        // Print machine code
+        // Print translated code
         {
-            Box box{"Machine Code"};
-            for (auto x : code)
-                box << std::to_string(x) << " ";
+            Box box{"IA32"};
+            box << code.str();
             cerr << box << endl;
         }
     } catch (AssemblerError& e) {
