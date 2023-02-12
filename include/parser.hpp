@@ -1,6 +1,7 @@
 #pragma once
 #include <errors.hpp>
 #include <instruction_tables.hpp>
+#include <iostream>
 #include <lexer.hpp>
 #include <optional>
 #include <ostream>
@@ -14,7 +15,7 @@ struct Line {
 
     Type which;
     Token data[3] = {Token{}, Token{}, Token{}};
-    int16_t num{0}, num2{0};  
+    int32_t num{0}, num2{0};  
 
     bool operator==(const Line& rhs) const;
     string to_string() const;
@@ -22,6 +23,6 @@ struct Line {
 };
 
 bool is_identifier(const Token& tok);
-optional<int16_t> parse_number(string s);
+optional<int32_t> parse_number(string s);
 
 vector<Line> parse(const vector<Token>& tokens);

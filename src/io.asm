@@ -5,6 +5,8 @@ section .bss
     fibs resd FIBS_N
 
 section .data
+    OUTPUT.msg db "Quantidade de bytes escritos = " ; message for OUTPUT
+    OUTPUT.msg.len equ $ - OUTPUT.msg
 
     str1 db "Hello World!", 10 
     str1_len equ $-str1
@@ -31,7 +33,8 @@ print_fibs.loop:
 
     ; Print the i-th fibonacci number
     push ecx
-    mov eax, [fibs+ecx*4]
+    mov eax, [fibs+ecx*4] ; parameter
+    push eax
     call OUTPUT.int
     pop ecx
 
@@ -78,8 +81,11 @@ INPUT.exit:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;        OUTPUT.int        ;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; eax = integer to print
+; push {integer to print}
 OUTPUT.int:
+    pop ebx ; return address
+    pop eax ; integer to print
+    push ebx
     mov ecx, 0 ; buffer index
 
     cmp eax, 0

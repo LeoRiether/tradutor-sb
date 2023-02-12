@@ -17,6 +17,8 @@ string Line::to_string() const {
         return data[0] + ":";
     if (which == IsInstruction)
         return data[0] + " " + data[1] + " " + data[2];
+    if (which == IsDirective && !data[1].empty())
+        return data[0] + " " + data[1];
     if (which == IsDirective)
         return data[0] + " " + std::to_string(num);
     if (which == IsSection)
@@ -38,9 +40,9 @@ bool is_identifier(const Token& tok) {
 // WARN: talvez esteja errado pra negativos ainda
 // Faz o parsing de um número em `s`
 // e retorna nullopt caso o formato seja inválido,
-// ou o int16_t correspondente.
-optional<int16_t> parse_number(string s) {
-    int16_t ans = 0;
+// ou o int32_t correspondente.
+optional<int32_t> parse_number(string s) {
+    int32_t ans = 0;
     bool neg = false;
 
     if (s[0] == '-') {
@@ -114,17 +116,25 @@ vector<Line> parse(const vector<Token>& tokens) {
         else if (instructions.count(tokens[i])) {
             Line line{Line::IsInstruction};
             const auto& instr = instructions.at(tokens[i]);
+            std::cout << "[src/parser.cpp:118] instr = " << tokens[i] << std::endl;
             line.data[0] = tokens[i++];
 
             // Verificação dos argumentos da instrução
             for (size_t j = 1; j < instr.size; j++) {
                 // Verificamos se o token i+j é válido
-                if (i >= n || !is_identifier(tokens[i]))
-                    throw AssemblerError(
-                        "Sintático",
-                        "Argumento faltando para a instrução <" + tokens[i-1] +
-                            ">",
-                        tokens[i-1].line, tokens[i-1].column);
+                // if (i >= n || !is_identifier(tokens[i]))
+                //     throw AssemblerError(
+                //         "Sintático",
+                //         "Argumento faltando para a instrução <" + tokens[i-1] +
+                //             ">",
+                //         tokens[i-1].line, tokens[i-1].column);
+
+                // Número de bytes do OUTPUT_S e INPUT_S são armazenados no num2
+                if ((line.data[0] == "OUTPUT_S" || line.data[0] == "INPUT_S") &&
+                    j == 2) {
+                    line.num2 = *parse_number(tokens[i++]);
+                    continue;
+                }
 
                 // Token válido! Add à linha
                 line.data[j] = tokens[i++];
@@ -132,7 +142,7 @@ vector<Line> parse(const vector<Token>& tokens) {
                 // Talvez a label tenha offset
                 if (i < n && tokens[i] == "+") {
                     i++; // skip '+'
-                    optional<int16_t> opt;
+                    optional<int32_t> opt;
                     if (i >= n || !(opt = parse_number(tokens[i])))
                         throw AssemblerError("Sintático",
                                              "Era esperado um offset após o "
@@ -164,7 +174,7 @@ vector<Line> parse(const vector<Token>& tokens) {
 
             // How many spaces?
             i++;
-            optional<int16_t> opt;
+            optional<int32_t> opt;
             if (i < n && (opt = parse_number(tokens[i]))) {
                 line.num = *opt;
                 i++;
@@ -179,9 +189,13 @@ vector<Line> parse(const vector<Token>& tokens) {
 
             // Argument
             i++;
-            optional<int16_t> opt;
+            optional<int32_t> opt;
             if (i < n && (opt = parse_number(tokens[i]))) {
                 line.num = *opt;
+                i++;
+            } else if (tokens[i].size() == 1) {
+                line.data[1] = tokens[i];
+                line.num = 0;
                 i++;
             } else {
                 throw AssemblerError(

@@ -7,7 +7,7 @@
 
 using std::string;
 using std::pair;
-using MacroNameTable = std::unordered_map<string, pair<uint16_t, uint16_t>>;
+using MacroNameTable = std::unordered_map<string, pair<uint32_t, uint32_t>>;
 using MacroDefinitionTable = std::vector<Token>;
 
 vector<Token> preprocess_equs_ifs(const vector<Token>& tokens);

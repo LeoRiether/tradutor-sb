@@ -74,6 +74,12 @@ vector<Token> lex(std::istream& input) {
                     // Start of an ident or macro argument
                     current = Token{line, column, std::string{c}};
                     st = Ident;
+                } else if (c == '\'') { // 'A'
+                    char chr = input.get();
+                    current = Token{line, column+1, std::string{chr}};
+                    push_ident();
+                    input.get(); // '
+                    st = Idle;
                 } else {
                     throw AssemblerError(
                         "Léxico",

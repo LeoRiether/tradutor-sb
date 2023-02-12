@@ -32,7 +32,7 @@ void gen_instruction(GeneratorState& state, const Line& line) {
     // for (size_t i = 1; i < instr_data.size; i++) {
     //     Token argument = line.data[i];
     //
-    //     uint16_t memory_address = symbols.find(argument)->second;
+    //     uint32_t memory_address = symbols.find(argument)->second;
     //     // offset (from the XY+2 syntax)
     //     memory_address += (i == 1 ? line.num : line.num2);
     //
