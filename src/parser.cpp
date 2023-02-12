@@ -18,7 +18,7 @@ string Line::to_string() const {
     if (which == IsInstruction)
         return data[0] + " " + data[1] + " " + data[2];
     if (which == IsDirective && !data[1].empty())
-        return data[0] + " " + data[1];
+        return data[0] + " '" + data[1] + "'";
     if (which == IsDirective)
         return data[0] + " " + std::to_string(num);
     if (which == IsSection)
@@ -116,7 +116,6 @@ vector<Line> parse(const vector<Token>& tokens) {
         else if (instructions.count(tokens[i])) {
             Line line{Line::IsInstruction};
             const auto& instr = instructions.at(tokens[i]);
-            std::cout << "[src/parser.cpp:118] instr = " << tokens[i] << std::endl;
             line.data[0] = tokens[i++];
 
             // Verificação dos argumentos da instrução
@@ -193,8 +192,8 @@ vector<Line> parse(const vector<Token>& tokens) {
             if (i < n && (opt = parse_number(tokens[i]))) {
                 line.num = *opt;
                 i++;
-            } else if (tokens[i].size() == 1) {
-                line.data[1] = tokens[i];
+            } else if (tokens[i].size() == 3 && tokens[i][0] == '\'') {
+                line.data[1] = Token{ 0, 0, std::string{tokens[i][1]} };
                 line.num = 0;
                 i++;
             } else {

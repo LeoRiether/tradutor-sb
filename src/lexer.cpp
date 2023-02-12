@@ -75,10 +75,11 @@ vector<Token> lex(std::istream& input) {
                     current = Token{line, column, std::string{c}};
                     st = Ident;
                 } else if (c == '\'') { // 'A'
-                    char chr = input.get();
-                    current = Token{line, column+1, std::string{chr}};
+                    char chr = input.get(); column++;
+                    current = Token{line, column, std::string{'\'', chr, '\''}};
                     push_ident();
                     input.get(); // '
+                    column++;
                     st = Idle;
                 } else {
                     throw AssemblerError(

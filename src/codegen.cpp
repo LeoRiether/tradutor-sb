@@ -57,6 +57,8 @@ void gen_directive(GeneratorState& state, const Line& line) {
   
     if (directive == "SPACE")
         section << " resd " << line.num << '\n';
+    else if (directive == "CONST" && !line.data[1].empty())
+        section << " db '" << line.data[1] << "'\n";
     else if (directive == "CONST")
         section << " dd " << line.num << '\n';
 }

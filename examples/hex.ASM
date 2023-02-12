@@ -1,4 +1,6 @@
 SECTION TEXT
+    OUTPUT_S HW, 13
+
     INPUT X
     LOAD X
 
@@ -50,4 +52,18 @@ SECTION DATA
     CHR: SPACE
     AUX: SPACE
 
-    TEST: CONST 'A'
+    HW:
+    CONST 'H'
+    CONST 'e'
+    CONST 'l'
+    CONST 'l'
+    CONST 'o'
+    CONST ' '
+    CONST 'w'
+    CONST 'o'
+    CONST 'r'
+    CONST 'l'
+    CONST 'd'
+    CONST '!'
+    CONST 10
+
