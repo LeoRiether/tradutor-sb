@@ -26,8 +26,21 @@ void gen_label(GeneratorState& state, const Line& line) {
         state.pending_labels.emplace(line.data[0]);
 }
 
+// TODO: tomar cuidado para colocar label+offset certo! 
 void gen_instruction(GeneratorState& state, const Line& line) {
-    // Token instruction = line.data[0];
+    Token instruction = line.data[0];
+
+    if (instruction == "OUTPUT_S") {
+        state.used_feature.set(GeneratorState::Features::Output_S);
+        // TODO: mudar para uma call a "OUTPUT.str"
+        state.text << indent << "mov eax, 4\n"
+                   << indent << "mov ebx, 1\n"
+                   << indent << "mov ecx, " << line.data[1]
+                   << "\n"  // BUG: faltando offset!
+                   << indent << "mov edx, " << line.num2 << "\n"
+                   << indent << "int 80h\n";
+    }
+
     // machine_code.push_back(instr_data.opcode);
     // for (size_t i = 1; i < instr_data.size; i++) {
     //     Token argument = line.data[i];
