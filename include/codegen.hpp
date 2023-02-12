@@ -15,8 +15,8 @@ struct GeneratorState {
     Section current_section;
     std::queue<string> pending_labels;
 
-    enum Features { Output_I, Input_I, Output_S, Input_S, FeatureLen };
-    std::bitset<FeatureLen> used_feature;
+    enum Features { Output_I, Input_I, Output_S, Input_S, _FeaturesLen };
+    std::bitset<_FeaturesLen> used_feature;
 
     stringstream data, bss, text;
 

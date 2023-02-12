@@ -9,7 +9,7 @@
 
 - Sistema Operacional: Linux (Manjaro/Ubuntu 22.04)
 - Compilador: g++ 11.3.0
-- [Repositório do Projeto](github.com/LeoRiether/montador-sb)
+- [Repositório do Projeto](https://github.com/LeoRiether/tradutor-sb)
 
 ## Compilação
 
@@ -59,7 +59,7 @@ Para mais informações a respeito do funcionamento do montador:
 
 ## Como rodar os testes
 
-Foi utilizado o framework [Catch2](https://github.com/catchorg/Catch2) para realizar testes de unidade.
+Foi utilizado o framework [Catch2](https://github.com/catchorg/Catch2) para realizar testes unitários.
 
 Os testes podem ser executados utilizando os comandos:
 
