@@ -45,16 +45,20 @@ void gen_directive(GeneratorState& state, const Line& line) {
     stringstream& section = directive == "SPACE" ? state.bss : state.data;
 
     // Put the pending labels in the section they belong 
+    bool first = true;
     while (!state.pending_labels.empty()) {
         const string label = state.pending_labels.front();
         state.pending_labels.pop();
-        section << label << ":\n";
+
+        if (!first) section << ":\n";
+        section << label;
+        first = false;
     }
   
     if (directive == "SPACE")
-        section << indent << "resd " << line.num << '\n';
+        section << " resd " << line.num << '\n';
     else if (directive == "CONST")
-        section << indent << "dd " << line.num << '\n';
+        section << " dd " << line.num << '\n';
 }
 
 GeneratorState generate_ia32(const vector<Line>& lines) {
