@@ -3,14 +3,17 @@
 const char* indent = "    ";
 
 std::ostream& operator<<(std::ostream& os, const GeneratorState& gs) {
-    os << "section .text\n";
-    os << gs.text.rdbuf() << '\n';
+    os << "section .data\n" << gs.data.rdbuf() << '\n';
 
-    os << "section .bss\n";
-    os << gs.bss.rdbuf() << '\n';
+    os << "section .bss\n" << gs.bss.rdbuf() << '\n';
 
-    os << "section .data\n";
-    os << gs.data.rdbuf() << '\n';
+    os << "section .text\n"
+       << "global _start\n"
+       << "_start:\n"
+       << gs.text.rdbuf() << '\n'
+       << "STOP: mov eax, 1\n"
+       << "      xor ebx, ebx\n"
+       << "      int 80h";
 
     return os;
 }
