@@ -1,15 +1,26 @@
 #pragma once
 #include <parser.hpp>
-
 #include <string>
 #include <unordered_map>
 
 using std::string;
-using SymbolTable = std::unordered_map<string, uint16_t>;
 
-// First pass of the codegen
-SymbolTable build_symbol_table(const vector<Line> &lines);
+struct GeneratorState {
+    // TODO: do we even need to know the current section?
+    enum Section { Text, Data };
+    Section current_section;
 
-// Second pass of the codegen
-vector<uint16_t> generate_machine_code(const vector<Line> &lines,
-                                       const SymbolTable &symbols);
+    string data, bss, text;
+
+    GeneratorState() : current_section(Text), data(""), bss(""), text("") {
+    }
+
+    friend std::ostream& operator<<(std::ostream& os, const GeneratorState& gs);
+};
+
+inline GeneratorState::Section section_from_string(const string& section) {
+    return section == "DATA" ? GeneratorState::Section::Data
+                             : GeneratorState::Section::Text;
+}
+
+GeneratorState generate_ia32(const vector<Line>& lines);
