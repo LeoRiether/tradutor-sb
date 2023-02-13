@@ -75,7 +75,6 @@ std::vector<Token> do_preprocessing(std::string file_base) {
 void do_translation(std::vector<Token> tokens, std::string file_base) {
     std::ofstream output(file_base + ".S");
 
-    std::cout << "ok" << std::endl;
     try {
         // Parse tokens into lines
         auto lines = parse(tokens);
