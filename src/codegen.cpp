@@ -1,11 +1,17 @@
 #include <codegen.hpp>
+#include <fstream>
 
 const char* indent = "    ";
 
 std::ostream& operator<<(std::ostream& os, const GeneratorState& gs) {
     os << "section .data\n" << gs.data.rdbuf() << '\n';
 
-    os << "section .bss\n" << gs.bss.rdbuf() << '\n';
+    os << "section .bss\n" << gs.bss.rdbuf();
+    if (gs.used_feature[GeneratorState::Features::Output_I] or
+        gs.used_feature[GeneratorState::Features::Input_I]) {
+        os << "int.buffer resb 12 ; buffer for INPUT/OUTPUT.int\n";
+    }
+    os << "\n";
 
     os << "section .text\n"
        << "global _start\n"
@@ -13,7 +19,50 @@ std::ostream& operator<<(std::ostream& os, const GeneratorState& gs) {
        << gs.text.rdbuf() << '\n'
        << "STOP: mov eax, 1\n"
        << "      xor ebx, ebx\n"
-       << "      int 80h";
+       << "      int 80h\n\n";
+
+    std::string line;
+    if (gs.used_feature[GeneratorState::Features::Output_I]) {
+        std::ifstream file ("src/output_int.asm");
+        if (file.is_open()) {
+            while (getline(file,line)) {
+                os << line << "\n";
+
+            }
+            file.close();
+            os << "\n";
+        }
+    }
+    if (gs.used_feature[GeneratorState::Features::Output_S]) {
+        std::ifstream file ("src/output_str.asm");
+        if (file.is_open()) {
+            while (getline(file,line))
+                os << line << "\n";
+            file.close();
+            os << "\n";
+        }
+    }
+
+    if (gs.used_feature[GeneratorState::Features::Input_I]) {
+        std::ifstream file ("src/input_int.asm");
+        if (file.is_open()) {
+            while (getline(file,line))
+                os << line << "\n";
+            file.close();
+            os << "\n";
+        }
+    }
+
+    if (gs.used_feature[GeneratorState::Features::Input_S]) {
+        std::ifstream file ("src/input_str.asm");
+        if (file.is_open()) {
+            while (getline(file,line))
+                os << line << "\n";
+            file.close();
+            os << "\n";
+        }
+    }
+
 
     return os;
 }
