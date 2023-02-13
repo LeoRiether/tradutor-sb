@@ -1,5 +1,6 @@
 #pragma once
 #include <bitset>
+#include <fstream>
 #include <iostream>
 #include <parser.hpp>
 #include <queue>

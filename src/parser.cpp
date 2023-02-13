@@ -12,11 +12,20 @@ bool Line::operator==(const Line& rhs) const {
     return true;
 }
 
+string format_label_with_offset(const string& label, int offset, bool times4) {
+    if (label.empty())
+        return "";
+    if (offset == 0)
+        return label;
+    return label + "+" + to_string(offset) + (times4 ? "*4" : "");
+}
+
 string Line::to_string() const {
     if (which == IsLabel)
         return data[0] + ":";
     if (which == IsInstruction)
-        return data[0] + " " + data[1] + " " + data[2];
+        return data[0] + " " + format_label_with_offset(data[1], num, false) +
+               " " + format_label_with_offset(data[2], num2, false);
     if (which == IsDirective && !data[1].empty())
         return data[0] + " '" + data[1] + "'";
     if (which == IsDirective)

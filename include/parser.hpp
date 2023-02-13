@@ -22,6 +22,8 @@ struct Line {
     friend std::ostream& operator<<(std::ostream& os, const Line& line);
 };
 
+string format_label_with_offset(const string& label, int offset, bool times4=true);
+
 bool is_identifier(const Token& tok);
 optional<int32_t> parse_number(string s);
 

@@ -54,11 +54,16 @@ void gen_label(GeneratorState& state, const Line& line) {
 void gen_instruction(GeneratorState& state, const Line& line) {
     Token instruction = line.data[0];
 
+    state.text << indent << "; " << line.to_string() << '\n';
+
+    string label1 = format_label_with_offset(line.data[1], line.num);
+    string label2 = format_label_with_offset(line.data[2], line.num2);
+
     // OUTPUT
     if (instruction == "OUTPUT_S") {
         state.used_feature.set(GeneratorState::Features::Output_S);
         state.text << indent << "push eax\n";
-        state.text << indent << "mov ecx, DWORD [" << line.data[1] << "]\n" // BUG: faltando offset!
+        state.text << indent << "mov ecx, " << label1 << "\n"
                    << indent << "mov edx, " << line.num2 << "\n"
                    << indent << "call OUTPUT.str\n"
                    << indent << "pop eax\n";
@@ -66,7 +71,7 @@ void gen_instruction(GeneratorState& state, const Line& line) {
     else if (instruction == "OUTPUT_C") {
         state.used_feature.set(GeneratorState::Features::Output_S);
         state.text << indent << "push eax\n"
-                   << indent << "mov ecx, BYTE [" << line.data[1] << "]\n"
+                   << indent << "mov ecx, " << label1 << "\n"
                    << indent << "mov edx, 1\n"
                    << indent << "call OUTPUT.str\n"
                    << indent << "pop eax\n";
@@ -75,7 +80,7 @@ void gen_instruction(GeneratorState& state, const Line& line) {
     else if (instruction == "OUTPUT") {
         state.used_feature.set(GeneratorState::Features::Output_I);
         state.text << indent << "push eax\n"
-                   << indent << "push DWORD [" << line.data[1] << "]\n"
+                   << indent << "push DWORD [" << label1 << "]\n"
                    << indent << "call OUTPUT.int\n"
                    << indent << "pop eax\n";
     }
@@ -84,7 +89,7 @@ void gen_instruction(GeneratorState& state, const Line& line) {
     else if (instruction == "INPUT_S") {
         state.used_feature.set(GeneratorState::Features::Input_S);
         state.text << indent << "push eax\n"
-                   << indent << "mov ecx, DWORD [" << line.data[1] << "]\n"
+                   << indent << "mov ecx, " << label1 << "\n"
                    << indent << "mov edx, " << line.num2 << "\n"
                    << indent << "call INPUT.str\n"
                    << indent << "pop eax\n";
@@ -92,7 +97,7 @@ void gen_instruction(GeneratorState& state, const Line& line) {
     else if (instruction == "INPUT_C") {
         state.used_feature.set(GeneratorState::Features::Input_S);
         state.text << indent << "push eax\n"
-                   << indent << "mov ecx, DWORD [" << line.data[1] << "]\n"
+                   << indent << "mov ecx, " << label1 << "\n"
                    << indent << "mov edx, 1\n"
                    << indent << "call INPUT.str\n"
                    << indent << "pop eax\n";
@@ -102,72 +107,59 @@ void gen_instruction(GeneratorState& state, const Line& line) {
         state.used_feature.set(GeneratorState::Features::Input_I);
         state.text << indent << "push eax\n"
                    << indent << "call INPUT.int\n"
-                   << indent << "mov DWORD [" << line.data[1] << "], eax\n"
+                   << indent << "mov DWORD [" << label1 << "], eax\n"
                    << indent << "pop eax\n";
 
     }
 
     // ARITHMETIC OPERATIONS
     else if (instruction == "ADD") {
-        state.text << indent << "add eax, DWORD [" << line.data[1] << "]\n";
+        state.text << indent << "add eax, DWORD [" << label1 << "]\n";
     }
     else if (instruction == "SUB") {
-        state.text << indent << "sub eax, DWORD [" << line.data[1] << "]\n";
+        state.text << indent << "sub eax, DWORD [" << label1 << "]\n";
     }
     else if (instruction == "MUL" or instruction == "MULT") {
-        state.text << indent << "imul DWORD [" << line.data[1] << "]\n";
+        state.text << indent << "imul DWORD [" << label1 << "]\n";
     }
     else if (instruction == "DIV") {
         state.text << indent << "cdq" << "\n"
-                   << indent << "idiv DWORD [" << line.data[1] << "]\n";
+                   << indent << "idiv DWORD [" << label1 << "]\n";
     }
 
     // JUMPS
     else if (instruction == "JMP") {
-        state.text << indent << "call " << line.data[1] << "\n";
+        state.text << indent << "jmp " << label1 << "\n";
     }
     else if (instruction == "JMPN") {
         state.text << indent << "cmp eax, 0\n"
-                   << indent << "jl " << line.data[1] << "\n";
+                   << indent << "jl " << label1 << "\n";
     }
     else if (instruction == "JMPP") {
         state.text << indent << "cmp eax, 0\n"
-                   << indent << "jg " << line.data[1] << "\n";
+                   << indent << "jg " << label1 << "\n";
     }
     else if (instruction == "JMPZ") {
         state.text << indent << "cmp eax, 0\n"
-                   << indent << "je " << line.data[1] << "\n";
+                   << indent << "je " << label1 << "\n";
     }
 
     // MEMORY/SYSTEM
     else if (instruction == "COPY") {
-        state.text << indent << "mov ebx, DWORD [" << line.data[1] << "]\n"
-                   << indent << "mov DWORD [" << line.data[2] << "], ebx\n";
+        state.text << indent << "mov ebx, DWORD [" << label1 << "]\n"
+                   << indent << "mov DWORD [" << label2 << "], ebx\n";
     }
     else if (instruction == "LOAD") {
-        state.text << indent << "mov eax, DWORD [" << line.data[1] << "]\n";
+        state.text << indent << "mov eax, DWORD [" << label1 << "]\n";
     }
     else if (instruction == "STORE") {
-        state.text << indent << "mov DWORD [" << line.data[1] << "], eax\n";
+        state.text << indent << "mov DWORD [" << label1 << "], eax\n";
     }
     else if (instruction == "STOP") {
         state.text << indent << "jmp STOP\n";
     }
 
-
-
-
-
-    // machine_code.push_back(instr_data.opcode);
-    // for (size_t i = 1; i < instr_data.size; i++) {
-    //     Token argument = line.data[i];
-    //
-    //     uint32_t memory_address = symbols.find(argument)->second;
-    //     // offset (from the XY+2 syntax)
-    //     memory_address += (i == 1 ? line.num : line.num2);
-    //
-    //     machine_code.push_back(memory_address);
-    // }
+    state.text << '\n';
 }
 
 void gen_directive(GeneratorState& state, const Line& line) {
