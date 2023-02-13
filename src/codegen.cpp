@@ -4,9 +4,9 @@
 const char* indent = "    ";
 
 std::ostream& operator<<(std::ostream& os, const GeneratorState& gs) {
-    os << "section .data\n" << gs.data.rdbuf() << '\n';
+    os << "section .data\n" << gs.data.str() << '\n';
 
-    os << "section .bss\n" << gs.bss.rdbuf();
+    os << "section .bss\n" << gs.bss.str();
     if (gs.used_feature[GeneratorState::Features::Output_I] or
         gs.used_feature[GeneratorState::Features::Input_I]) {
         os << "int.buffer resb 12 ; buffer for INPUT/OUTPUT.int\n";
@@ -16,7 +16,7 @@ std::ostream& operator<<(std::ostream& os, const GeneratorState& gs) {
     os << "section .text\n"
        << "global _start\n"
        << "_start:\n"
-       << gs.text.rdbuf() << '\n'
+       << gs.text.str() << '\n'
        << "STOP: mov eax, 1\n"
        << "      xor ebx, ebx\n"
        << "      int 80h\n\n";
@@ -66,7 +66,7 @@ void gen_instruction(GeneratorState& state, const Line& line) {
     else if (instruction == "OUTPUT_C") {
         state.used_feature.set(GeneratorState::Features::Output_S);
         state.text << indent << "push eax\n"
-                   << indent << "mov ecx, DWORD [" << line.data[1] << "]\n"
+                   << indent << "mov ecx, BYTE [" << line.data[1] << "]\n"
                    << indent << "mov edx, 1\n"
                    << indent << "call OUTPUT.str\n"
                    << indent << "pop eax\n";
