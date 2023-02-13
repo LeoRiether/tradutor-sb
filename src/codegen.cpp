@@ -27,52 +27,77 @@ void gen_label(GeneratorState& state, const Line& line) {
 }
 
 // TODO: tomar cuidado para colocar label+offset certo!
-// TODO: estou admitindo que o AX é o registrador acumulador
 void gen_instruction(GeneratorState& state, const Line& line) {
     Token instruction = line.data[0];
 
     // OUTPUT
     if (instruction == "OUTPUT_S") {
         state.used_feature.set(GeneratorState::Features::Output_S);
-        // TODO: mudar para uma call a "OUTPUT.str"
-        state.text << indent << "mov eax, 4\n"
-                   << indent << "mov ebx, 1\n"
-                   << indent << "mov ecx, " << line.data[1]
-                   << "\n"  // BUG: faltando offset!
+        state.text << indent << "push eax\n";
+        state.text << indent << "mov ecx, " << line.data[1] << "\n" // BUG: faltando offset!
                    << indent << "mov edx, " << line.num2 << "\n"
-                   << indent << "int 80h\n";
+                   << indent << "call OUTPUT.str\n"
+                   << indent << "pop eax\n";
     }
     else if (instruction == "OUTPUT_C") {
+        state.used_feature.set(GeneratorState::Features::Output_S);
+        state.text << indent << "push eax\n"
+                   << indent << "mov ecx, " << line.data[1] << "\n"
+                   << indent << "mov edx, 1\n"
+                   << indent << "call OUTPUT.str\n"
+                   << indent << "pop eax\n";
 
     }
     else if (instruction == "OUTPUT") {
-
+        state.used_feature.set(GeneratorState::Features::Output_I);
+        state.text << indent << "push eax\n"
+                   << indent << "push " << line.data[1] << "\n"
+                   << indent << "call OUTPUT.int\n"
+                   << indent << "pop eax\n";
     }
 
     // INPUT
     else if (instruction == "INPUT_S") {
-
+        state.used_feature.set(GeneratorState::Features::Input_S);
+        state.text << indent << "push eax\n"
+                   << indent << "mov ecx, " << line.data[1] << "\n"
+                   << indent << "mov edx, " << line.num2 << "\n"
+                   << indent << "call INPUT.str\n"
+                   << indent << "pop eax\n";
     }
     else if (instruction == "INPUT_C") {
+        state.used_feature.set(GeneratorState::Features::Input_S);
+        state.text << indent << "push eax\n"
+                   << indent << "mov ecx, " << line.data[1] << "\n"
+                   << indent << "mov edx, 1\n"
+                   << indent << "call INPUT.str\n"
+                   << indent << "pop eax\n";
 
     }
     else if (instruction == "INPUT") {
+        state.used_feature.set(GeneratorState::Features::Input_I);
+        state.text << indent << "push eax\n"
+                   << indent << "call INPUT.int\n"
+                   << indent << "mov [" << line.data[1] << "], eax\n"
+                   << indent << "pop eax\n";
 
     }
 
     // ARITHMETIC OPERATIONS
     else if (instruction == "ADD") {
-        state.text << indent << "add ax " << line.data[1] << "\n";
+        state.text << indent << "add eax, " << line.data[1] << "\n";
     }
     else if (instruction == "SUB") {
-        state.text << indent << "sub ax " << line.data[1] << "\n";
+        state.text << indent << "sub eax, " << line.data[1] << "\n";
     }
     else if (instruction == "MUL" or instruction == "MULT") {
-        state.text << indent << "imul ax " << line.data[1] << "\n";
+        state.text << indent << "mov ebx, " << line.data[1] << "\n"
+                   << indent << "imul ebx\n";
     }
     else if (instruction == "DIV") {
-        state.text << indent << "cdq" << "\n";
-        state.text << indent << "idiv ax " << line.data[1] << "\n";
+        state.text << indent << "mov ebx, " << line.data[1] << "\n"
+                   << indent << "cdq" << "\n"
+                   << indent << "idiv ebx\n";
     }
 
     // JUMPS
@@ -80,27 +105,28 @@ void gen_instruction(GeneratorState& state, const Line& line) {
         state.text << indent << "call " << line.data[1] << "\n";
     }
     else if (instruction == "JMPN") {
-        state.text << indent << "cmp ax, 0\n";
-        state.text << indent << "jl " << line.data[1] << "\n";
+        state.text << indent << "cmp eax, 0\n"
+                   << indent << "jl " << line.data[1] << "\n";
     }
     else if (instruction == "JMPP") {
-        state.text << indent << "cmp ax, 0\n";
-        state.text << indent << "jg " << line.data[1] << "\n";
+        state.text << indent << "cmp eax, 0\n"
+                   << indent << "jg " << line.data[1] << "\n";
     }
     else if (instruction == "JMPZ") {
-        state.text << indent << "cmp ax, 0\n";
-        state.text << indent << "je " << line.data[1] << "\n";
+        state.text << indent << "cmp eax, 0\n"
+                   << indent << "je " << line.data[1] << "\n";
     }
 
     // MEMORY/SYSTEM
     else if (instruction == "COPY") {
-        
+        state.text << indent << "mov ebx, " << line.data[1] << "\n"
+                   << indent << "mov [" << line.data[2] << "], ebx\n";
     }
     else if (instruction == "LOAD") {
-        
+        state.text << indent << "mov eax, " << line.data[1] << "\n";
     }
     else if (instruction == "STORE") {
-        
+        state.text << indent << "mov [" << line.data[1] << "], eax\n";
     }
     else if (instruction == "STOP") {
         state.text << indent << "jmp STOP\n";
