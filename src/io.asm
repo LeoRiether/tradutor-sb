@@ -1,21 +1,16 @@
 section .bss
-    int.buffer resb 12 ; buffer for OUTPUT.int
+    int.buffer resb 12 ; buffer for INPUT/OUTPUT.int
 
-    %assign FIBS_N 50
-    fibs resd FIBS_N
+    fibs resd 50
 
 section .data
     OUTPUT.msg db "Quantidade de bytes escritos = " ; message for OUTPUT
     OUTPUT.msg.len equ $ - OUTPUT.msg
 
-    str1 db "Hello World!", 10 
-    str1_len equ $-str1
+    str_in db "How many fibonacci numbers?", 10
+    str_in_len equ $-str_in
 
-    str2 db "Hello Assembly!", 10
-    str2_len equ $-str2
-
-    str3 db "Hello there!", 10
-    str3_len equ $-str3
+    fibs_n dw 0, 8
 
 section .text
 global _start
@@ -28,8 +23,8 @@ _start:
 
     mov ecx, 0 ; i
 print_fibs.loop:
-    cmp ecx, FIBS_N
-    jge print_fibs.out
+    cmp ecx, [fibs_n]
+    jge exit
 
     ; Print the i-th fibonacci number
     push ecx
@@ -40,11 +35,6 @@ print_fibs.loop:
 
     inc ecx
     jmp print_fibs.loop
-print_fibs.out:
-
-    mov ecx, str2
-    mov edx, str2_len
-    call OUTPUT.str
 
 exit:
     mov eax, 1
@@ -55,11 +45,18 @@ exit:
 ;        Calc fibs        ;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;
 calc_fibs:
+    ; input n
+    mov ecx, str_in
+    mov edx, str_in_len
+    call OUTPUT.str
+    call INPUT.int
+    mov [fibs_n], eax
+
     mov DWORD [fibs], 0
     mov DWORD [fibs+4], 1
     mov ecx, 2
 calc_fibs.loop:
-    cmp ecx, FIBS_N
+    cmp ecx, DWORD [fibs_n]
     jge calc_fibs.exit
     
     mov eax, [fibs+ecx*4-4]
@@ -70,12 +67,80 @@ calc_fibs.loop:
 calc_fibs.exit:
     ret
 
-;;;;;;;;;;;;;;;;;;;;;;;
-;        INPUT        ;
-;;;;;;;;;;;;;;;;;;;;;;;
-INPUT:
+;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;        INPUT.int        ;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; returns eax with the integer
+INPUT.int:
+    mov eax, 3 ; sys_read
+    mov ebx, 0 ; stdin
+    mov ecx, int.buffer
+    mov edx, 12
+    int 80h
+
+    mov eax, 0 ; integer value
+    mov ecx, 0 ; buffer index
+
+    jmp INPUT.convert_ascii.int
     
-INPUT.exit:
+INPUT.convert_ascii_loop.int:
+    inc ecx
+
+INPUT.convert_ascii.int:
+    cmp BYTE [int.buffer + ecx], '-' ; ignore '-'
+    je INPUT.convert_ascii_loop.int
+
+    cmp BYTE [int.buffer + ecx], '0' ; char < '0' non-numerical
+    jb INPUT.check_sign.int
+
+    cmp BYTE [int.buffer + ecx], '9' ; char > '9' non-numerical
+    ja INPUT.check_sign.int
+
+    ; ans *= 10
+    mov ebx, 10
+    imul ebx
+
+    ; ans += char - '0'
+    movzx ebx, BYTE [int.buffer + ecx]
+    add eax, ebx
+    sub eax, '0'
+
+    jmp INPUT.convert_ascii_loop.int
+
+INPUT.check_sign.int:
+    ; if positive, skip to the end
+    cmp BYTE [int.buffer], '-'
+    jne INPUT.int.exit
+
+INPUT.negative.int:
+    mov ebx, -1
+    imul ebx
+    
+INPUT.int.exit:
+    ret
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;        INPUT.str        ;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; Non-conventional calling:
+; ecx = pointer to buffer
+; edx = buffer length
+INPUT.str:
+    mov eax, 3 ; sys_read
+    mov ebx, 0 ; stdin
+    int 80h
+    ret
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;         INPUT.char        ;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; Non-conventional calling:
+; ecx = pointer to variable
+INPUT.char:
+    mov eax, 3 ; sys_read
+    mov ebx, 0 ; stdin
+    mov edx, 1 ; sizeof(char)
+    int 80h
     ret
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
