@@ -26,10 +26,12 @@ void gen_label(GeneratorState& state, const Line& line) {
         state.pending_labels.emplace(line.data[0]);
 }
 
-// TODO: tomar cuidado para colocar label+offset certo! 
+// TODO: tomar cuidado para colocar label+offset certo!
+// TODO: estou admitindo que o AX é o registrador acumulador
 void gen_instruction(GeneratorState& state, const Line& line) {
     Token instruction = line.data[0];
 
+    // OUTPUT
     if (instruction == "OUTPUT_S") {
         state.used_feature.set(GeneratorState::Features::Output_S);
         // TODO: mudar para uma call a "OUTPUT.str"
@@ -40,6 +42,73 @@ void gen_instruction(GeneratorState& state, const Line& line) {
                    << indent << "mov edx, " << line.num2 << "\n"
                    << indent << "int 80h\n";
     }
+    else if (instruction == "OUTPUT_C") {
+
+    }
+    else if (instruction == "OUTPUT") {
+
+    }
+
+    // INPUT
+    else if (instruction == "INPUT_S") {
+
+    }
+    else if (instruction == "INPUT_C") {
+
+    }
+    else if (instruction == "INPUT") {
+
+    }
+
+    // ARITHMETIC OPERATIONS
+    else if (instruction == "ADD") {
+        state.text << indent << "add ax " << line.data[1] << "\n";
+    }
+    else if (instruction == "SUB") {
+        state.text << indent << "sub ax " << line.data[1] << "\n";
+    }
+    else if (instruction == "MUL" or instruction == "MULT") {
+        state.text << indent << "imul ax " << line.data[1] << "\n";
+    }
+    else if (instruction == "DIV") {
+        state.text << indent << "cdq" << "\n";
+        state.text << indent << "idiv ax " << line.data[1] << "\n";
+    }
+
+    // JUMPS
+    else if (instruction == "JMP") {
+        state.text << indent << "call " << line.data[1] << "\n";
+    }
+    else if (instruction == "JMPN") {
+        state.text << indent << "cmp ax, 0\n";
+        state.text << indent << "jl " << line.data[1] << "\n";
+    }
+    else if (instruction == "JMPP") {
+        state.text << indent << "cmp ax, 0\n";
+        state.text << indent << "jg " << line.data[1] << "\n";
+    }
+    else if (instruction == "JMPZ") {
+        state.text << indent << "cmp ax, 0\n";
+        state.text << indent << "je " << line.data[1] << "\n";
+    }
+
+    // MEMORY/SYSTEM
+    else if (instruction == "COPY") {
+        
+    }
+    else if (instruction == "LOAD") {
+        
+    }
+    else if (instruction == "STORE") {
+        
+    }
+    else if (instruction == "STOP") {
+        state.text << indent << "jmp STOP\n";
+    }
+
+
+
+
 
     // machine_code.push_back(instr_data.opcode);
     // for (size_t i = 1; i < instr_data.size; i++) {
