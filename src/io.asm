@@ -131,18 +131,6 @@ INPUT.str:
     int 80h
     ret
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;         INPUT.char        ;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; Non-conventional calling:
-; ecx = pointer to variable
-INPUT.char:
-    mov eax, 3 ; sys_read
-    mov ebx, 0 ; stdin
-    mov edx, 1 ; sizeof(char)
-    int 80h
-    ret
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;        OUTPUT.int        ;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
