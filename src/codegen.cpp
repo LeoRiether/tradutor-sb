@@ -21,48 +21,23 @@ std::ostream& operator<<(std::ostream& os, const GeneratorState& gs) {
        << "      xor ebx, ebx\n"
        << "      int 80h\n\n";
 
-    std::string line;
-    if (gs.used_feature[GeneratorState::Features::Output_I]) {
-        std::ifstream file ("src/output_int.asm");
-        if (file.is_open()) {
-            while (getline(file,line)) {
-                os << line << "\n";
-
+    auto dump_io_file = [&](int feature_type, std::string file_name) {
+        std::string line;
+        if (gs.used_feature[feature_type]) {
+            std::ifstream file ("src/" + file_name);
+            if (file.is_open()) {
+                while (getline(file,line))
+                    os << line << "\n";
+                file.close();
+                os << "\n";
             }
-            file.close();
-            os << "\n";
         }
-    }
-    if (gs.used_feature[GeneratorState::Features::Output_S]) {
-        std::ifstream file ("src/output_str.asm");
-        if (file.is_open()) {
-            while (getline(file,line))
-                os << line << "\n";
-            file.close();
-            os << "\n";
-        }
-    }
+    };
 
-    if (gs.used_feature[GeneratorState::Features::Input_I]) {
-        std::ifstream file ("src/input_int.asm");
-        if (file.is_open()) {
-            while (getline(file,line))
-                os << line << "\n";
-            file.close();
-            os << "\n";
-        }
-    }
-
-    if (gs.used_feature[GeneratorState::Features::Input_S]) {
-        std::ifstream file ("src/input_str.asm");
-        if (file.is_open()) {
-            while (getline(file,line))
-                os << line << "\n";
-            file.close();
-            os << "\n";
-        }
-    }
-
+    dump_io_file(GeneratorState::Features::Output_I, "output_int.asm");
+    dump_io_file(GeneratorState::Features::Output_S, "output_str.asm");
+    dump_io_file(GeneratorState::Features::Input_I, "input_int.asm");
+    dump_io_file(GeneratorState::Features::Input_S, "input_str.asm");
 
     return os;
 }
