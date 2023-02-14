@@ -48,6 +48,7 @@ INPUT.negative.int:
     imul ebx
     
 INPUT.int.exit:
+    add ecx, 1
     push eax
     push ecx
     push read_bytes.msg
