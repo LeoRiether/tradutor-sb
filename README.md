@@ -47,7 +47,7 @@ Para mais informações a respeito do funcionamento do tradutor:
 ## Entrada e Saída
 Além do código em C++, escritas funções em IA-32 para realizar entrada e saída. Elas podem ser encontradas em nos arquivos `src/input_int.asm`, `src/input_str.asm`, `src/output_int.asm` e `src/output_str.asm`.
 
-Cada função só é colocada na saída final do tradutor caso sua respectiva instrução seja utilizada no arquivo de entrada. Por exemplo, o `OUTPUT.str` só é colocado na saída caso a instrução `OUTPUT_S` ou `OUTPUT_C` seja usada na entrad.
+Cada função só é colocada na saída final do tradutor caso sua respectiva instrução seja utilizada no arquivo de entrada. Por exemplo, o `INPUT.str` só é colocado na saída caso a instrução `INPUT_S` ou `INPUT_C` seja usada na entrada.
 
 
 ## Como rodar os testes
