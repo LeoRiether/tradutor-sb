@@ -1,5 +1,6 @@
 SECTION TEXT
     OUTPUT_S HW, 13
+    ; INPUT_S HW, 13
 
     INPUT BEFORE_X+1
 

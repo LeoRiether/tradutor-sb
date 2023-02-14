@@ -9,4 +9,4 @@ INPUT.str:
     mov ecx, [esp+8] ; pointer to buffer
     mov edx, [esp+4] ; buffer length
     int 80h
-    ret
+    ret 8

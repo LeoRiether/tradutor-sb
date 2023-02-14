@@ -9,4 +9,4 @@ OUTPUT.str:
     mov ecx, [esp+8]
     mov edx, [esp+4]
     int 80h
-    ret
+    ret 8

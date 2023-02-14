@@ -56,4 +56,4 @@ OUTPUT.int.buffer_to_stdout:
     mov ebx, 1           ; stdout
     mov ecx, int.buffer  ; buffer pointer
     int 80h              ; make the syscall
-    ret
+    ret 4
