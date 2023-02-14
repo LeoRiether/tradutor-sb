@@ -4,11 +4,9 @@
 ; push {pointer to buffer}
 ; push {buffer length}
 INPUT.str:
-    pop eax ; return address
-    pop edx ; buffer length
-    pop ecx ; pointer to buffer
-    push eax ; return address
     mov eax, 3 ; sys_read
     mov ebx, 0 ; stdin
+    mov ecx, [esp+8] ; pointer to buffer
+    mov edx, [esp+4] ; buffer length
     int 80h
     ret

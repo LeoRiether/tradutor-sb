@@ -3,9 +3,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; push {integer to print}
 OUTPUT.int:
-    pop ebx ; return address
-    pop eax ; integer to print
-    push ebx
+    mov eax, [esp+4] ; integer to print
     mov ecx, 0 ; buffer index
 
     cmp eax, 0

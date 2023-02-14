@@ -64,6 +64,7 @@ void gen_instruction(GeneratorState& state, const Line& line) {
                    << indent << "push " << label1 << "\n"
                    << indent << "push " << line.num2 << "\n"
                    << indent << "call OUTPUT.str\n"
+                   << indent << "add esp, 8\n"
                    << indent << "pop eax\n";
     }
     else if (instruction == "OUTPUT_C") {
@@ -72,6 +73,7 @@ void gen_instruction(GeneratorState& state, const Line& line) {
                    << indent << "push " << label1 << "\n"
                    << indent << "push 1\n"
                    << indent << "call OUTPUT.str\n"
+                   << indent << "add esp, 8\n"
                    << indent << "pop eax\n";
 
     }
@@ -80,6 +82,7 @@ void gen_instruction(GeneratorState& state, const Line& line) {
         state.text << indent << "push eax\n"
                    << indent << "push DWORD [" << label1 << "]\n"
                    << indent << "call OUTPUT.int\n"
+                   << indent << "add esp, 4\n"
                    << indent << "pop eax\n";
     }
 
@@ -90,6 +93,7 @@ void gen_instruction(GeneratorState& state, const Line& line) {
                    << indent << "push " << label1 << "\n"
                    << indent << "push " << line.num2 << "\n"
                    << indent << "call INPUT.str\n"
+                   << indent << "add esp, 8\n"
                    << indent << "pop eax\n";
     }
     else if (instruction == "INPUT_C") {
@@ -98,6 +102,7 @@ void gen_instruction(GeneratorState& state, const Line& line) {
                    << indent << "push " << label1 << "\n"
                    << indent << "push 1\n"
                    << indent << "call INPUT.str\n"
+                   << indent << "add esp, 8\n"
                    << indent << "pop eax\n";
     }
     else if (instruction == "INPUT") {
