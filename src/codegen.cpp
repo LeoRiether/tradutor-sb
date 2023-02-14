@@ -5,9 +5,14 @@ const char* indent = "    ";
 std::ostream& operator<<(std::ostream& os, const GeneratorState& gs) {
     os << "section .data\n" << gs.data.str() << '\n';
 
+    // If we used any feature
+    if (gs.used_feature.count()) {
+        os << "IO.msg db \"Quantidade de bytes lidos/escritos = \"\n"
+           << "IO.msg.len equ $-IO.msg\n";
+    }
+
     os << "section .bss\n" << gs.bss.str();
-    if (gs.used_feature[GeneratorState::Features::Output_I] or
-        gs.used_feature[GeneratorState::Features::Input_I]) {
+    if (gs.used_feature.count()) {
         os << "int.buffer resb 12 ; buffer for INPUT/OUTPUT.int\n";
     }
     os << "\n";
@@ -60,6 +65,7 @@ void gen_instruction(GeneratorState& state, const Line& line) {
     // OUTPUT
     if (instruction == "OUTPUT_S") {
         state.used_feature.set(GeneratorState::Features::Output_S);
+        state.used_feature.set(GeneratorState::Features::Output_I);
         state.text << indent << "push eax\n"
                    << indent << "push " << label1 << "\n"
                    << indent << "push " << line.num2 << "\n"
@@ -68,6 +74,7 @@ void gen_instruction(GeneratorState& state, const Line& line) {
     }
     else if (instruction == "OUTPUT_C") {
         state.used_feature.set(GeneratorState::Features::Output_S);
+        state.used_feature.set(GeneratorState::Features::Output_I);
         state.text << indent << "push eax\n"
                    << indent << "push " << label1 << "\n"
                    << indent << "push 1\n"
@@ -86,6 +93,7 @@ void gen_instruction(GeneratorState& state, const Line& line) {
     // INPUT
     else if (instruction == "INPUT_S") {
         state.used_feature.set(GeneratorState::Features::Input_S);
+        state.used_feature.set(GeneratorState::Features::Output_I);
         state.text << indent << "push eax\n"
                    << indent << "push " << label1 << "\n"
                    << indent << "push " << line.num2 << "\n"
@@ -94,6 +102,7 @@ void gen_instruction(GeneratorState& state, const Line& line) {
     }
     else if (instruction == "INPUT_C") {
         state.used_feature.set(GeneratorState::Features::Input_S);
+        state.used_feature.set(GeneratorState::Features::Output_I);
         state.text << indent << "push eax\n"
                    << indent << "push " << label1 << "\n"
                    << indent << "push 1\n"
@@ -102,6 +111,7 @@ void gen_instruction(GeneratorState& state, const Line& line) {
     }
     else if (instruction == "INPUT") {
         state.used_feature.set(GeneratorState::Features::Input_I);
+        state.used_feature.set(GeneratorState::Features::Output_I);
         state.text << indent << "push eax\n"
                    << indent << "call INPUT.int\n"
                    << indent << "mov DWORD [" << label1 << "], eax\n"
