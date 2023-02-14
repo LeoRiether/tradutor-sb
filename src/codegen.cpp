@@ -4,6 +4,13 @@ const char* indent = "    ";
 
 std::ostream& operator<<(std::ostream& os, const GeneratorState& gs) {
     os << "section .data\n" << gs.data.str() << '\n';
+    if (gs.used_feature[GeneratorState::Features::Input_S] or
+        gs.used_feature[GeneratorState::Features::Input_I]) {
+        os << "read_bytes.msg db \"Quantidade de bytes lidos = \"\n";
+        os << "read_bytes.msg.len equ $ - read_bytes.msg\n";
+    }
+
+    os << "\n";
 
     os << "section .bss\n" << gs.bss.str();
     if (gs.used_feature[GeneratorState::Features::Output_I] or
@@ -56,6 +63,12 @@ void gen_instruction(GeneratorState& state, const Line& line) {
 
     string label1 = format_label_with_offset(line.data[1], line.num);
     string label2 = format_label_with_offset(line.data[2], line.num2);
+
+    if (instruction.rfind("INPUT", 0) == 0) {
+        // INPUT needs OUTPUT to show read bytes information.
+        state.used_feature.set(GeneratorState::Features::Output_I);
+        state.used_feature.set(GeneratorState::Features::Output_S);
+    }
 
     // OUTPUT
     if (instruction == "OUTPUT_S") {

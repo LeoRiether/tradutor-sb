@@ -9,4 +9,11 @@ INPUT.str:
     mov ecx, [esp+8] ; pointer to buffer
     mov edx, [esp+4] ; buffer length
     int 80h
+    push ecx
+    push eax
+    push read_bytes.msg
+    push read_bytes.msg.len
+    call OUTPUT.str
+    call OUTPUT.int
+    pop ecx
     ret 8
