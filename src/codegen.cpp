@@ -60,17 +60,17 @@ void gen_instruction(GeneratorState& state, const Line& line) {
     // OUTPUT
     if (instruction == "OUTPUT_S") {
         state.used_feature.set(GeneratorState::Features::Output_S);
-        state.text << indent << "push eax\n";
-        state.text << indent << "mov ecx, " << label1 << "\n"
-                   << indent << "mov edx, " << line.num2 << "\n"
+        state.text << indent << "push eax\n"
+                   << indent << "push " << label1 << "\n"
+                   << indent << "push " << line.num2 << "\n"
                    << indent << "call OUTPUT.str\n"
                    << indent << "pop eax\n";
     }
     else if (instruction == "OUTPUT_C") {
         state.used_feature.set(GeneratorState::Features::Output_S);
         state.text << indent << "push eax\n"
-                   << indent << "mov ecx, " << label1 << "\n"
-                   << indent << "mov edx, 1\n"
+                   << indent << "push " << label1 << "\n"
+                   << indent << "push 1\n"
                    << indent << "call OUTPUT.str\n"
                    << indent << "pop eax\n";
 
@@ -87,19 +87,18 @@ void gen_instruction(GeneratorState& state, const Line& line) {
     else if (instruction == "INPUT_S") {
         state.used_feature.set(GeneratorState::Features::Input_S);
         state.text << indent << "push eax\n"
-                   << indent << "mov ecx, " << label1 << "\n"
-                   << indent << "mov edx, " << line.num2 << "\n"
+                   << indent << "push " << label1 << "\n"
+                   << indent << "push " << line.num2 << "\n"
                    << indent << "call INPUT.str\n"
                    << indent << "pop eax\n";
     }
     else if (instruction == "INPUT_C") {
         state.used_feature.set(GeneratorState::Features::Input_S);
         state.text << indent << "push eax\n"
-                   << indent << "mov ecx, " << label1 << "\n"
-                   << indent << "mov edx, 1\n"
+                   << indent << "push " << label1 << "\n"
+                   << indent << "push 1\n"
                    << indent << "call INPUT.str\n"
                    << indent << "pop eax\n";
-
     }
     else if (instruction == "INPUT") {
         state.used_feature.set(GeneratorState::Features::Input_I);
