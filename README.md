@@ -21,31 +21,19 @@ make
 
 ## Uso
 
-O montador pode ser executado com o seguinte comando:
+O tradutor pode ser executado com o seguinte comando:
 
 ```
-./MONTADOR -<ops> <file>
+./TRADUTOR <filename_without_extension>
 ```
 
-A interface oferece 3 operações para o usuário:
+Este comando traduz o arquivo `filename_without_extension.ASM` e coloca a saída
+em `filename_without_extension.S`.
 
-- p: Pré-processamento de EQUs e IFs (.PRE)
-- m: Pré-processamento até MACROs (.MCR)
-- o: Gera o arquivo objeto (.OBJ)
-
-É possível utilizar mais de uma operação na mesma execução:
-
+Para mais informações a respeito do funcionamento do tradutor:
 ```
-./MONTADOR -pmo examples/bin
+./TRADUTOR -h
 ```
-
-O comando acima executará as 3 operações na mesma chamada.
-
-Para mais informações a respeito do funcionamento do montador:
-```
-./MONTADOR -h
-```
-
 
 ## Estrutura do Projeto
 - Os arquivos fonte estão em `src/`, os headers, no `include/`, e por fim os testes, em `tests/`
@@ -53,8 +41,13 @@ Para mais informações a respeito do funcionamento do montador:
     - __lexer__: lê os tokens de um arquivo (já funciona, falta tratamento de erros)
     - __preprocessor__: processa EQUs, IFs e MACROs
     - __parser__: transforma os tokens em um vetor "uniforme" de linhas da forma `[label:] <op> [arg1] [arg2]`
-    - __codegen__: gera o código de máquina a partir do vetor de linhas
+    - __codegen__: traduz as linhas geradas pelo parser em assembly IA-32 
     - __main__: executa o pipeline de módulos
+
+## Entrada e Saída
+Além do código em C++, escritas funções em IA-32 para realizar entrada e saída. Elas podem ser encontradas em nos arquivos `src/input_int.asm`, `src/input_str.asm`, `src/output_int.asm` e `src/output_str.asm`.
+
+Cada função só é colocada na saída final do tradutor caso sua respectiva instrução seja utilizada no arquivo de entrada. Por exemplo, o `OUTPUT.str` só é colocado na saída caso a instrução `OUTPUT_S` ou `OUTPUT_C` seja usada na entrad.
 
 
 ## Como rodar os testes

@@ -1,5 +1,4 @@
 #include <codegen.hpp>
-#include <fstream>
 
 const char* indent = "    ";
 
@@ -50,7 +49,6 @@ void gen_label(GeneratorState& state, const Line& line) {
         state.pending_labels.emplace(line.data[0]);
 }
 
-// TODO: tomar cuidado para colocar label+offset certo!
 void gen_instruction(GeneratorState& state, const Line& line) {
     Token instruction = line.data[0];
 
